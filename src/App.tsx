@@ -27,7 +27,6 @@ function App() {
       ...prevState,
       { id: prevState.length, title: "", body: "" },
     ]);
-    console.log(notes);
   };
 
   const handleNotes = (
@@ -35,6 +34,11 @@ function App() {
     index: number
   ) => {
     const { name, value } = event.target;
+    if (index === -1) return;
+    if (name === "title" && value.length > 20) return;
+    if (name === "body" && value.length > 1000) return;
+    if (name === "title" && value.length === 0) return;
+    if (name === "body" && value.length === 0) return;
     setNotes((prevState) => {
       const updatedData = [...prevState];
       updatedData[index] = {
@@ -50,6 +54,10 @@ function App() {
     if (notes) {
       setNotes(JSON.parse(notes));
     }
+  };
+
+  const delNote = (id: number) => {
+    setNotes((prevState) => prevState.filter((note) => note.id !== id));
   };
 
   useEffect(() => {
@@ -72,21 +80,30 @@ function App() {
       <div className="flex-grow-1">
         <InputGroup>
           <div className="p-2" key={currNote?.id}>
+            <Form.Label>Title</Form.Label>
             <Form.Control
               name="title"
               value={currNote?.title}
               as="input"
               onChange={(e) => handleNotes(e, currNote?.id || 0)}
             />
+            <Form.Label>Body</Form.Label>
             <Form.Control
+              rows={20}
+              cols={50}
               name="body"
               value={currNote?.body}
               as="textarea"
               onChange={(e) => handleNotes(e, currNote?.id || 0)}
             />
           </div>
-          <Button onClick={addNote}>Add Note</Button>
         </InputGroup>
+        <Button className="p-2" onClick={addNote}>
+          Add Note
+        </Button>
+        <Button className="p-2" onClick={() => delNote(currentId)}>
+          Delete Note
+        </Button>
       </div>
     </div>
   );
