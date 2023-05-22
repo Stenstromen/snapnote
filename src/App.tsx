@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ChangeEvent, useEffect, useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Form from "react-bootstrap/Form";
 import { Button, InputGroup } from "react-bootstrap";
+import Sidebar from "./Components/Sidebar";
 
 interface INote {
   id: number;
@@ -11,11 +13,12 @@ interface INote {
 }
 
 function App() {
+  const [currentId, setCurrentId] = useState<number>(0);
   const [notes, setNotes] = useState<INote[]>([
     {
       id: 0,
-      title: "",
-      body: "",
+      title: "asdf",
+      body: "asdf",
     },
   ]);
 
@@ -27,22 +30,10 @@ function App() {
     console.log(notes);
   };
 
-  /*   const handleAdd = () => {
-    setFormData(prevState => [
-      ...prevState,
-      { id: prevState.length, title: '', body: '' }
-    ]);
-  }; */
-
-  /*   const handleNotes = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setNotes((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  }; */
-
-  const handleNotes = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
+  const handleNotes = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index: number
+  ) => {
     const { name, value } = event.target;
     setNotes((prevState) => {
       const updatedData = [...prevState];
@@ -73,33 +64,30 @@ function App() {
     saveNote();
   }, [notes, saveNote]);
 
+  const currNote = notes.find((note) => note.id === currentId);
+
   return (
-    <div className="d-flex justify-content-center" style={{
-      height: "100vh",
-      width: "100vw",
-      
-    }}>
-      <InputGroup className="justify-content-center text-center flex-column" style={{width: "1080px"}}>
-        {
-          notes.map((note, index) => (
-            <div className="p-2" key={note.id}>
-              <Form.Control
-                name="title"
-                value={note.title}
-                as="input"
-                onChange={(e) => handleNotes(e, index)}
-              />
-              <Form.Control
-                name="body"
-                value={note.body}
-                as="textarea"
-                onChange={(e) => handleNotes(e, index)}
-              />
-            </div>
-          ))
-        }
-        <Button onClick={addNote}>Add Note</Button>
-      </InputGroup>
+    <div className="d-flex">
+      <Sidebar notes={notes} setCurrentId={setCurrentId} />
+      <div className="flex-grow-1">
+        <InputGroup>
+          <div className="p-2" key={currNote?.id}>
+            <Form.Control
+              name="title"
+              value={currNote?.title}
+              as="input"
+              onChange={(e) => handleNotes(e, currNote?.id || 0)}
+            />
+            <Form.Control
+              name="body"
+              value={currNote?.body}
+              as="textarea"
+              onChange={(e) => handleNotes(e, currNote?.id || 0)}
+            />
+          </div>
+          <Button onClick={addNote}>Add Note</Button>
+        </InputGroup>
+      </div>
     </div>
   );
 }
