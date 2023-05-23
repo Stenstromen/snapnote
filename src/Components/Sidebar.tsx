@@ -8,14 +8,8 @@ function Sidebar({
   setCurrentId: (id: number) => void;
 }) {
   return (
-    <div
-      className="sidebar"
-      style={{
-        height: "100vh",
-        border: "1px solid black",
-      }}
-    >
-      <Nav className="flex-column">
+    <div className="sidebar">
+      <Nav className="sidebar-content">
         {notes.map(({ id, title }: { id: number; title: string }) => {
           return (
             <Nav.Link key={id} onClick={() => setCurrentId(id)}>
