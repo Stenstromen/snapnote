@@ -78,16 +78,40 @@ function App() {
 
   const modules = {
     toolbar: [
-      ["bold", "italic", "underline"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["image"],
+      [{ font: [] }],
+      [{ size: ["small", false, "large", "huge"] }],
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      [{ color: [] }, { background: [] }],
+      ["blockquote", "code-block"],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }, { align: [] }],
+      ["link", "image"],
+      ["clean"],
     ],
     imageResize: {
       modules: ["Resize", "DisplaySize"],
     },
   };
 
-  const formats = ["bold", "italic", "underline", "list", "bullet", "image"];
+  const formats = [
+    "font",
+    "size",
+    "header",
+    "color",
+    "background",
+    "blockquote",
+    "code-block",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "align",
+    "image",
+    "link",
+    "clean",
+  ];
 
   useEffect(() => {
     loadNote();
