@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ChangeEvent, useEffect, useState } from "react";
+import axios from "axios";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
@@ -30,6 +32,13 @@ function App() {
       delta: null,
     },
   ]);
+
+  const postNote = async (note: INote) => {
+    console.log(note);
+    const response = await axios.post("http://localhost:8080/post", note);
+    const data = await response.data;
+    console.log(data);
+  };
 
   const addNote = () => {
     setNotes((prevState) => [
@@ -158,6 +167,9 @@ function App() {
                   onClick={() => delNote(currentId)}
                 >
                   Del Note
+                </Button>
+                <Button className="p-1" onClick={() => postNote(currNote!)}>
+                  Save Note
                 </Button>
               </div>
             </div>
