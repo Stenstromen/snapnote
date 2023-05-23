@@ -80,7 +80,8 @@ function App() {
     toolbar: [
       [{ font: [] }],
       [{ size: ["small", false, "large", "huge"] }],
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      [{ header: 1}],
+      [{ header: 2}],
       [{ color: [] }, { background: [] }],
       ["blockquote", "code-block"],
       ["bold", "italic", "underline", "strike"],
