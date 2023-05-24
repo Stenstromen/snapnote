@@ -32,6 +32,7 @@ function App() {
       delta: null,
     },
   ]);
+  const [remote, setRemote] = useState<INote[]>([]);
 
   const postNote = async (note: INote) => {
     console.log(note);
@@ -89,8 +90,8 @@ function App() {
     toolbar: [
       [{ font: [] }],
       [{ size: ["small", false, "large", "huge"] }],
-      [{ header: 1}],
-      [{ header: 2}],
+      [{ header: 1 }],
+      [{ header: 2 }],
       [{ color: [] }, { background: [] }],
       ["blockquote", "code-block"],
       ["bold", "italic", "underline", "strike"],
@@ -136,6 +137,21 @@ function App() {
   }, [notes, saveNote]);
 
   const currNote = notes.find((note) => note.id === currentId);
+
+  const fetchNotes = async () => {
+    const response = await axios.get("http://localhost:8080/get/o6sg1uwd", {
+      headers: {
+        Authorization: "123",
+      },
+    });
+    const data = await response.data;
+    setRemote((remote) => [...remote, data]);
+    console.log(data);
+  };
+
+ /*  useEffect(() => {
+    fetchNotes();
+  }, []); */
 
   return (
     <div className="d-flex w-100 main">
@@ -186,6 +202,13 @@ function App() {
             {currNote?.image && <img src={currNote?.image} alt="Uploaded" />}
           </div>
         </InputGroup>
+{/*         <ReactQuill
+          value={remote[0]?.body}
+          modules={modules}
+          formats={formats}
+          placeholder="Body"
+        />
+        <Button onClick={fetchNotes}>Fetch Notes</Button> */}
       </div>
     </div>
   );
