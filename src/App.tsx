@@ -7,9 +7,11 @@ import "react-quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Form from "react-bootstrap/Form";
-import { Button, InputGroup } from "react-bootstrap";
+/* import Form from "react-bootstrap/Form";
+import { Button, InputGroup } from "react-bootstrap"; */
 import Sidebar from "./Components/Sidebar";
+import Home from "./Pages/Home";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 interface INote {
   id: number;
@@ -86,44 +88,6 @@ function App() {
     setNotes((prevState) => prevState.filter((note) => note.id !== id));
   };
 
-  const modules = {
-    toolbar: [
-      [{ font: [] }],
-      [{ size: ["small", false, "large", "huge"] }],
-      [{ header: 1 }],
-      [{ header: 2 }],
-      [{ color: [] }, { background: [] }],
-      ["blockquote", "code-block"],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }, { align: [] }],
-      ["link", "image"],
-      ["clean"],
-    ],
-    imageResize: {
-      modules: ["Resize", "DisplaySize"],
-    },
-  };
-
-  const formats = [
-    "font",
-    "size",
-    "header",
-    "color",
-    "background",
-    "blockquote",
-    "code-block",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "bullet",
-    "align",
-    "image",
-    "link",
-    "clean",
-  ];
-
   useEffect(() => {
     loadNote();
   }, []);
@@ -149,67 +113,31 @@ function App() {
     console.log(data);
   };
 
- /*  useEffect(() => {
+  /*  useEffect(() => {
     fetchNotes();
   }, []); */
 
   return (
     <div className="d-flex w-100 main">
-      <Sidebar notes={notes} setCurrentId={setCurrentId} />
-      <div className="d-flex editor">
-        <InputGroup>
-          <div
-            className="d-flex p-2 flex-column editor-content"
-            key={currNote?.id}
-          >
-            <div className="d-flex ">
-              <Form.Control
-                className="w-50 d-flex"
-                name="title"
-                value={currNote?.title}
-                as="input"
-                onChange={(e) => handleInputChange(currNote?.id || 0, e)}
-                placeholder="asdfsadf"
+      <BrowserRouter>
+        <Sidebar notes={notes} setCurrentId={setCurrentId} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                currNote={currNote}
+                handleChange={handleChange}
+                handleInputChange={handleInputChange}
+                addNote={addNote}
+                delNote={delNote}
+                postNote={postNote}
+                currentId={currentId}
               />
-              &nbsp;
-              <div className="flex-end">
-                <Button className="p-1" onClick={addNote}>
-                  New Note
-                </Button>
-                &nbsp;
-                <Button
-                  className="p-1"
-                  variant="warning"
-                  onClick={() => delNote(currentId)}
-                >
-                  Del Note
-                </Button>
-                <Button className="p-1" onClick={() => postNote(currNote!)}>
-                  Save Note
-                </Button>
-              </div>
-            </div>
-
-            <ReactQuill
-              value={currNote?.body}
-              onChange={(value, _delta, _source, editor) =>
-                handleChange(currNote?.id || 0, value, editor.getContents())
-              }
-              modules={modules}
-              formats={formats}
-              placeholder="Body"
-            />
-            {currNote?.image && <img src={currNote?.image} alt="Uploaded" />}
-          </div>
-        </InputGroup>
-{/*         <ReactQuill
-          value={remote[0]?.body}
-          modules={modules}
-          formats={formats}
-          placeholder="Body"
-        />
-        <Button onClick={fetchNotes}>Fetch Notes</Button> */}
-      </div>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
