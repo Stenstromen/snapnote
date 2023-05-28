@@ -2,16 +2,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ChangeEvent, useEffect, useState } from "react";
 import axios from "axios";
-import ReactQuill, { Quill } from "react-quill";
+import { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-/* import Form from "react-bootstrap/Form";
-import { Button, InputGroup } from "react-bootstrap"; */
-import Sidebar from "./Components/Sidebar";
 import Home from "./Pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Share from "./Pages/Share";
 
 interface INote {
   id: number;
@@ -25,6 +23,7 @@ Quill.register("modules/imageResize", ImageResize);
 
 function App() {
   const [currentId, setCurrentId] = useState<number>(0);
+  const [remoteId, setRemoteId] = useState<string>("");
   const [notes, setNotes] = useState<INote[]>([
     {
       id: 0,
@@ -36,10 +35,20 @@ function App() {
   ]);
   const [remote, setRemote] = useState<INote[]>([]);
 
-  const postNote = async (note: INote) => {
+  const postNote = async (note: INote, secret: string) => {
     console.log(note);
-    const response = await axios.post("http://localhost:8080/post", note);
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/post`,
+      note,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: secret,
+        },
+      }
+    );
     const data = await response.data;
+    setRemoteId(data);
     console.log(data);
   };
 
@@ -100,32 +109,43 @@ function App() {
     saveNote();
   }, [notes, saveNote]);
 
+  useEffect(() => {
+    setRemoteId("");
+  }, [currentId]);
+
   const currNote = notes.find((note) => note.id === currentId);
 
-  const fetchNotes = async () => {
-    const response = await axios.get("http://localhost:8080/get/o6sg1uwd", {
-      headers: {
-        Authorization: "123",
-      },
-    });
-    const data = await response.data;
-    setRemote((remote) => [...remote, data]);
-    console.log(data);
+  const fetchNotes = async (id: string, token: string): Promise<void> => {
+    console.log(id);
+    console.log(token);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/get/${id}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      const data = response.data;
+      setRemote((remote) => [...remote, data]);
+      console.log("fetching remote");
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+    }
   };
-
-  /*  useEffect(() => {
-    fetchNotes();
-  }, []); */
 
   return (
     <div className="d-flex w-100 main">
       <BrowserRouter>
-        <Sidebar notes={notes} setCurrentId={setCurrentId} />
+        {/* <Sidebar notes={notes} setCurrentId={setCurrentId} /> */}
         <Routes>
           <Route
             path="/"
             element={
               <Home
+                notes={notes}
                 currNote={currNote}
                 handleChange={handleChange}
                 handleInputChange={handleInputChange}
@@ -133,8 +153,14 @@ function App() {
                 delNote={delNote}
                 postNote={postNote}
                 currentId={currentId}
+                setCurrentId={setCurrentId}
+                remoteId={remoteId}
               />
             }
+          />
+          <Route
+            path="/share/:id/:token"
+            element={<Share remote={remote} fetchNotes={fetchNotes} />}
           />
         </Routes>
       </BrowserRouter>

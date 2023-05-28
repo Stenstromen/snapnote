@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
-import { Button, InputGroup } from "react-bootstrap";
-import ReactQuill, { Quill } from "react-quill";
+import { Stack, Button, InputGroup, Modal, Nav } from "react-bootstrap";
+import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import Sidebar from "../Components/Sidebar";
+import { readAndCompressImage } from "browser-image-resizer";
+import {AiOutlineSave,AiOutlineDelete} from "react-icons/ai";
+import {HiOutlineDocumentPlus} from "react-icons/hi2";
 
 interface INote {
   id: number;
@@ -13,6 +18,7 @@ interface INote {
 }
 
 function Home({
+  notes,
   currNote,
   handleChange,
   handleInputChange,
@@ -20,7 +26,10 @@ function Home({
   delNote,
   postNote,
   currentId,
+  setCurrentId,
+  remoteId,
 }: {
+  notes: INote[];
   currNote: INote | undefined;
   handleChange: (index: number, value: string, delta: object) => void;
   handleInputChange: (
@@ -29,9 +38,24 @@ function Home({
   ) => void;
   addNote: () => void;
   delNote: (id: number) => void;
-  postNote: (note: INote) => void;
+  postNote: (note: INote, secret: string) => void;
   currentId: number;
+  setCurrentId: React.Dispatch<React.SetStateAction<number>>;
+  remoteId: string;
 }) {
+  const [show, setShow] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const quillRef = useRef<ReactQuill | null>(null);
+
+  const config = {
+    quality: 0.7,
+    maxWidth: 800,
+    maxHeight: 800,
+    autoRotate: true,
+    debug: true,
+  };
+
   const modules = {
     toolbar: [
       [{ font: [] }],
@@ -69,8 +93,55 @@ function Home({
     "link",
     "clean",
   ];
+
+  useEffect(() => {
+    if (quillRef.current != null) {
+      const quill = quillRef.current.getEditor();
+
+      // Add the custom handler here
+      quill.getModule("toolbar").addHandler("image", () => {
+        // trigger the file input dialog
+        const fileInput = document.createElement("input");
+        fileInput.setAttribute("type", "file");
+        fileInput.click();
+
+        fileInput.onchange = async () => {
+          if (fileInput.files === null) {
+            console.warn("No files selected");
+            return;
+          }
+          const file = fileInput.files[0];
+
+          // compress and resize the image
+          try {
+            const compressedFile = await readAndCompressImage(file, config);
+
+            // convert the Blob into a data URL
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              // get the cursor position
+              const range = quill.getSelection();
+              const position = range ? range.index : 0;
+
+              // insert the image
+              if (e.target === null) {
+                console.warn("No target");
+                return;
+              }
+              quill.insertEmbed(position, "image", e.target.result, "user");
+            };
+            reader.readAsDataURL(compressedFile);
+          } catch (error) {
+            console.error("Failed to compress and resize image", error);
+          }
+        };
+      });
+    }
+  }, []);
+
   return (
     <div className="d-flex editor">
+      <Sidebar notes={notes} currentId={currentId} setCurrentId={setCurrentId} />
       <InputGroup>
         <div
           className="d-flex p-2 flex-column editor-content"
@@ -88,7 +159,7 @@ function Home({
             &nbsp;
             <div className="flex-end">
               <Button className="p-1" onClick={addNote}>
-                New Note
+                <HiOutlineDocumentPlus size={22} />
               </Button>
               &nbsp;
               <Button
@@ -96,15 +167,16 @@ function Home({
                 variant="warning"
                 onClick={() => delNote(currentId)}
               >
-                Del Note
+                <AiOutlineDelete size={22} />
               </Button>
-              <Button className="p-1" onClick={() => postNote(currNote!)}>
-                Save Note
+              <Button className="p-1" onClick={() => setShow(!show)}>
+                <AiOutlineSave size={22} />
               </Button>
             </div>
           </div>
 
           <ReactQuill
+            ref={quillRef} // Pass the ref to the Quill component
             value={currNote?.body}
             onChange={(value, _delta, _source, editor) =>
               handleChange(currNote?.id || 0, value, editor.getContents())
@@ -116,13 +188,56 @@ function Home({
           {currNote?.image && <img src={currNote?.image} alt="Uploaded" />}
         </div>
       </InputGroup>
-      {/*         <ReactQuill
-      value={remote[0]?.body}
-      modules={modules}
-      formats={formats}
-      placeholder="Body"
-    />
-    <Button onClick={fetchNotes}>Fetch Notes</Button> */}
+      <Modal size="lg" centered show={show} onHide={() => setShow(!show)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Save Note</Modal.Title>
+        </Modal.Header>
+        <Stack direction="horizontal">
+          <Modal.Body>Pass:</Modal.Body>
+          <Form.Control
+            autoFocus
+            disabled={remoteId ? true : false}
+            type="password"
+            id="inputPassword5"
+            aria-describedby="passwordHelpBlock"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                postNote(currNote!, password);
+              }
+            }}
+          />
+        </Stack>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShow(!show)}>
+            Close
+          </Button>
+          <Button
+            disabled={remoteId ? true : false}
+            variant="primary"
+            onClick={() => postNote(currNote!, password)}
+          >
+            Save Changes
+          </Button>
+        </Modal.Footer>
+        <Modal.Footer>
+          {remoteId ? (
+            <Nav variant="pills" activeKey="1">
+              <Nav.Item>
+                <Nav.Link
+                  target="_blank"
+                  href={`${
+                    window.document.URL
+                  }share/${remoteId.trim()}/${password}`}
+                >
+                  {`${window.document.URL}share/${remoteId.trim()}/${password}`}
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          ) : null}
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
