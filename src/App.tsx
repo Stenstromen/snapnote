@@ -36,20 +36,21 @@ function App() {
   const [remote, setRemote] = useState<INote[]>([]);
 
   const postNote = async (note: INote, secret: string) => {
+    console.log(secret.trim())
     console.log(note);
     const response = await axios.post(
       `${import.meta.env.VITE_BACKEND_URL}/post`,
       note,
       {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: secret,
+          //"Content-Type": "application/json",
+          Authorization:secret.trim(),
         },
       }
     );
     const data = await response.data;
     setRemoteId(data);
-    console.log(data);
+    //console.log(data);
   };
 
   const addNote = () => {
@@ -123,7 +124,7 @@ function App() {
         `${import.meta.env.VITE_BACKEND_URL}/get/${id}`,
         {
           headers: {
-            Authorization: token,
+            "Authorization": token,
           },
         }
       );
