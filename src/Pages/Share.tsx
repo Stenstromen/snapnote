@@ -19,9 +19,17 @@ function Share({
 }) {
   const { id, token } = useParams<{ token: string; id: string }>();
 
+  function decodeAndManipulate(encodedString: string): string {
+    const decodedString = atob(encodedString);
+    const randomStringLength = 16;
+    const originalString = decodedString.substring(randomStringLength, decodedString.length - randomStringLength);
+  
+    return originalString;
+  }
+
   useEffect(() => {
     if (id && token) {
-      fetchNotes(id, token);
+      fetchNotes(id, decodeAndManipulate(token));
     }
   }, [id, token]);
 

@@ -6,8 +6,8 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Sidebar from "../Components/Sidebar";
 import { readAndCompressImage } from "browser-image-resizer";
-import {AiOutlineSave,AiOutlineDelete} from "react-icons/ai";
-import {HiOutlineDocumentPlus} from "react-icons/hi2";
+import { AiOutlineSave, AiOutlineDelete } from "react-icons/ai";
+import { HiOutlineDocumentPlus } from "react-icons/hi2";
 
 interface INote {
   id: number;
@@ -45,6 +45,7 @@ function Home({
 }) {
   const [show, setShow] = useState(false);
   const [password, setPassword] = useState("");
+  const [encodedPassword, setEncodedPassword] = useState("");
 
   const quillRef = useRef<ReactQuill | null>(null);
 
@@ -94,6 +95,34 @@ function Home({
     "clean",
   ];
 
+  async function generateRandomBytes(length: number): Promise<Uint8Array> {
+    const crypto = window.crypto || window.Crypto;
+
+    if (!crypto || !crypto.getRandomValues) {
+      throw new Error("Web Crypto API not available.");
+    }
+
+    const randomBytes = new Uint8Array(length);
+    crypto.getRandomValues(randomBytes);
+    return randomBytes;
+  }
+
+  async function manipulateAndEncode(input: string): Promise<string> {
+    // Generate 8 random characters
+    const randomBytesResult = await generateRandomBytes(8);
+    const randomString = Array.from(randomBytesResult)
+      .map((byte) => byte.toString(16))
+      .join("");
+
+    // Prepend and append the random characters to the input
+    const manipulatedString = randomString + input + randomString;
+
+    // Encode the manipulated string to base64
+    const encodedString = btoa(manipulatedString);
+
+    return encodedString;
+  }
+
   useEffect(() => {
     if (quillRef.current != null) {
       const quill = quillRef.current.getEditor();
@@ -141,7 +170,11 @@ function Home({
 
   return (
     <div className="d-flex editor">
-      <Sidebar notes={notes} currentId={currentId} setCurrentId={setCurrentId} />
+      <Sidebar
+        notes={notes}
+        currentId={currentId}
+        setCurrentId={setCurrentId}
+      />
       <InputGroup>
         <div
           className="d-flex p-2 flex-column editor-content"
@@ -205,6 +238,9 @@ function Home({
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 postNote(currNote!, password);
+                manipulateAndEncode(password).then((encodedResult) => {
+                  setEncodedPassword(encodedResult);
+                });
               }
             }}
           />
@@ -216,7 +252,12 @@ function Home({
           <Button
             disabled={remoteId ? true : false}
             variant="primary"
-            onClick={() => postNote(currNote!, password)}
+            onClick={() => {
+              postNote(currNote!, password);
+              manipulateAndEncode(password).then((encodedResult) => {
+                setEncodedPassword(encodedResult);
+              });
+            }}
           >
             Save Changes
           </Button>
@@ -229,9 +270,9 @@ function Home({
                   target="_blank"
                   href={`${
                     window.document.URL
-                  }share/${remoteId.trim()}/${password}`}
+                  }share/${remoteId.trim()}/${encodedPassword}`}
                 >
-                  {`${window.document.URL}share/${remoteId.trim()}/${password}`}
+                  {`${window.document.URL}share/${remoteId.trim()}/${encodedPassword}`}
                 </Nav.Link>
               </Nav.Item>
             </Nav>
