@@ -1,4 +1,18 @@
+body {
+  background-color: #333333 !important;
+}
+
+.ql-toolbar {
+  background-color: lightgray;
+  border-bottom: 3px solid black;
+}
+
 .ql-editor {
+  background-color: white;
+  height: 70vh;
+}
+
+.ql-container {
   height: 70vh;
 }
 
@@ -8,7 +22,7 @@
 
 .editor {
   margin-top: 20px;
-  width: 90vw;
+  width: 70vw;
 }
 
 .editor-content {
@@ -17,7 +31,9 @@
 }
 
 .sidebar {
-  margin-top: 20px;
+  background-color: black;
+  margin-top: 8px;
+  
   height: 100vh;
   width: 40px;
   border-right: 3px solid black;
@@ -25,6 +41,18 @@
 
 .sidebar-content {
   flex-direction: column;
+  margin: auto 0;
+  padding: 0px
+}
+
+.nav-link-custom {
+  padding-left: 10px !important;
+  padding-right: 2px !important;
+  /* border: 1px solid white; */
+}
+
+.share-title {
+  color: white
 }
 
 @media (max-width: 420px) {

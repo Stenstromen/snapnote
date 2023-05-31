@@ -39,7 +39,7 @@ function Share({
         className="d-flex p-2 flex-column editor-content"
         key={remote[0]?.id}
       >
-        <h1>{remote[0]?.title}</h1>
+        <h1 className="share-title">{remote[0]?.title}</h1>
         <ReactQuill
           value={remote[0]?.body}
           readOnly={true}

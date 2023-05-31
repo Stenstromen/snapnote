@@ -169,12 +169,14 @@ function Home({
   }, []);
 
   return (
-    <div className="d-flex editor">
-      <Sidebar
+    <>
+    <Sidebar
         notes={notes}
         currentId={currentId}
         setCurrentId={setCurrentId}
       />
+    <div className="d-flex editor">
+      
       <InputGroup>
         <div
           className="d-flex p-2 flex-column editor-content"
@@ -194,7 +196,6 @@ function Home({
               <Button className="p-1" onClick={addNote}>
                 <HiOutlineDocumentPlus size={22} />
               </Button>
-              &nbsp;
               <Button
                 className="p-1"
                 variant="warning"
@@ -221,7 +222,7 @@ function Home({
           {currNote?.image && <img src={currNote?.image} alt="Uploaded" />}
         </div>
       </InputGroup>
-      <Modal size="lg" centered show={show} onHide={() => setShow(!show)}>
+      <Modal size="lg" centered show={show} onHide={() => setShow(!show)} >
         <Modal.Header closeButton>
           <Modal.Title>Save Note</Modal.Title>
         </Modal.Header>
@@ -245,7 +246,7 @@ function Home({
             }}
           />
         </Stack>
-        <Modal.Footer>
+        <Modal.Footer >
           <Button variant="secondary" onClick={() => setShow(!show)}>
             Close
           </Button>
@@ -280,6 +281,7 @@ function Home({
         </Modal.Footer>
       </Modal>
     </div>
+    </>
   );
 }
 

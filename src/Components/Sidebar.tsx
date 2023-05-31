@@ -1,4 +1,5 @@
 import Nav from "react-bootstrap/Nav";
+import { HiOutlineDocumentText, HiOutlineDocument } from "react-icons/hi";
 
 function Sidebar({
   notes,
@@ -15,11 +16,16 @@ function Sidebar({
         {notes.map(({ id, title }: { id: number; title: string }) => {
           return (
             <Nav.Link
+            className="nav-link-custom"
               key={id}
               onClick={() => setCurrentId(id)}
-              style={{ color: id === currentId ? "Red" : "black" }}
+              style={{ color: id === currentId ? "Green" : "White" }}
             >
-              {title[0] ? title[0].toLocaleUpperCase() : "N"}
+              {title[0] ? (
+                <HiOutlineDocumentText size={22} />
+              ) : (
+                <HiOutlineDocument size={22} />
+              )}
             </Nav.Link>
           );
         })}

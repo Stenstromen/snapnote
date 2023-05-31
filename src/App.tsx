@@ -140,7 +140,6 @@ function App() {
   return (
     <div className="d-flex w-100 main">
       <BrowserRouter>
-        {/* <Sidebar notes={notes} setCurrentId={setCurrentId} /> */}
         <Routes>
           <Route
             path="/"
