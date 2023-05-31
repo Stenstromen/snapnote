@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import ReactQuill, { Quill } from "react-quill";
+import ReactQuill from "react-quill";
 
 interface INote {
   id: number;
