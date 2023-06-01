@@ -85,12 +85,27 @@ function App() {
     });
   };
 
-  const loadNote = () => {
-    const notes = localStorage.getItem("notes");
-    if (notes) {
-      setNotes(JSON.parse(notes));
+/*   const loadNote = (id) => {
+    const sanitizedUrl = window.location.href.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+    const note = localStorage.getItem(`${sanitizedUrl}_note_${id}`);
+    if (note) {
+      return JSON.parse(note);
     }
+    return null;
+  }; */
+  const loadAllNotes = () => {
+    const sanitizedUrl = window.location.href.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '');
+    const keys = Object.keys(localStorage);
+    const notes = keys
+      .filter(key => key.startsWith(`${sanitizedUrl}_note_`))
+      .map(key => {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      })
+      .filter(note => note !== null);
+    return notes;
   };
+  
 
   const delNote = (id: number) => {
     if (notes.length === 1) return;
@@ -99,15 +114,17 @@ function App() {
   };
 
   useEffect(() => {
-    loadNote();
+    console.log(loadAllNotes());
+    return setNotes(loadAllNotes());
   }, []);
 
-  const saveNote = () => {
-    localStorage.setItem("notes", JSON.stringify(notes));
+  const saveNote = (note: number) => {
+    const sanitizedUrl = window.location.href.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '');
+    localStorage.setItem(`${sanitizedUrl}_note_${note}`, JSON.stringify(currNote));
   };
 
   useEffect(() => {
-    saveNote();
+    saveNote(currentId);
   }, [notes, saveNote]);
 
   useEffect(() => {
