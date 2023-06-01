@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./Pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Share from "./Pages/Share";
+import { loadAllNotes, saveNote } from "./LocalStorage";
 
 interface INote {
   id: number;
@@ -22,35 +23,36 @@ interface INote {
 Quill.register("modules/imageResize", ImageResize);
 
 function App() {
-  const [currentId, setCurrentId] = useState<number>(0);
-  const [remoteId, setRemoteId] = useState<string>("");
-  const [notes, setNotes] = useState<INote[]>([
+  const initialNote = [
     {
       id: 0,
-      title: "asdf",
-      body: "asdf",
+      title: "Snappy Note",
+      body: "<h1>Snappy Note</h1><p>Snappy Note is a simple note taking app that allows you to take notes and share them with others.</p>",
       image: null,
       delta: null,
     },
-  ]);
+  ];
+
+  const [currentId, setCurrentId] = useState<number>(0);
+  const [remoteId, setRemoteId] = useState<string>("");
+  const [notes, setNotes] = useState<INote[]>(initialNote);
   const [remote, setRemote] = useState<INote[]>([]);
 
   const postNote = async (note: INote, secret: string) => {
-    console.log(secret.trim())
+    console.log(secret.trim());
     console.log(note);
     const response = await axios.post(
       `${import.meta.env.VITE_BACKEND_URL}/post`,
       note,
       {
         headers: {
-          //"Content-Type": "application/json",
-          Authorization:secret.trim(),
+          "Content-Type": "application/json",
+          Authorization: secret.trim(),
         },
       }
     );
     const data = await response.data;
     setRemoteId(data);
-    //console.log(data);
   };
 
   const addNote = () => {
@@ -85,53 +87,32 @@ function App() {
     });
   };
 
-/*   const loadNote = (id) => {
-    const sanitizedUrl = window.location.href.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
-    const note = localStorage.getItem(`${sanitizedUrl}_note_${id}`);
-    if (note) {
-      return JSON.parse(note);
-    }
-    return null;
-  }; */
-  const loadAllNotes = () => {
-    const sanitizedUrl = window.location.href.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '');
-    const keys = Object.keys(localStorage);
-    const notes = keys
-      .filter(key => key.startsWith(`${sanitizedUrl}_note_`))
-      .map(key => {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : null;
-      })
-      .filter(note => note !== null);
-    return notes;
-  };
-  
-
   const delNote = (id: number) => {
     if (notes.length === 1) return;
     setCurrentId(id - 1);
     setNotes((prevState) => prevState.filter((note) => note.id !== id));
+    const sanitizedUrl = window.location.href.replace(
+      /[&/\\#,+()$~%.'":*?<>{}]/g,
+      ""
+    );
+    localStorage.removeItem(`${sanitizedUrl}_note_${id}`);
   };
 
   useEffect(() => {
-    console.log(loadAllNotes());
+    if (localStorage.length <= 1) return;
     return setNotes(loadAllNotes());
   }, []);
 
-  const saveNote = (note: number) => {
-    const sanitizedUrl = window.location.href.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '');
-    localStorage.setItem(`${sanitizedUrl}_note_${note}`, JSON.stringify(currNote));
-  };
+  const currNote = notes.find((note) => note.id === currentId);
 
   useEffect(() => {
-    saveNote(currentId);
+    console.log(currNote);
+    saveNote(notes, currentId, currNote);
   }, [notes, saveNote]);
 
   useEffect(() => {
     setRemoteId("");
   }, [currentId]);
-
-  const currNote = notes.find((note) => note.id === currentId);
 
   const fetchNotes = async (id: string, token: string): Promise<void> => {
     console.log(id);
@@ -141,7 +122,7 @@ function App() {
         `${import.meta.env.VITE_BACKEND_URL}/get/${id}`,
         {
           headers: {
-            "Authorization": token,
+            Authorization: token,
           },
         }
       );
