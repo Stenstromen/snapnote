@@ -10,29 +10,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./Pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Share from "./Pages/Share";
-import { loadAllNotes, saveNote } from "./LocalStorage";
-
-interface INote {
-  id: number;
-  title: string;
-  body: string;
-  image: string | null;
-  delta: object | null;
-}
+import { initialNote, addNote, delNote, loadAllNotes, saveNote } from "./LocalStorage";
+import { INote } from "./Types";
 
 Quill.register("modules/imageResize", ImageResize);
 
 function App() {
-  const initialNote = [
-    {
-      id: 0,
-      title: "Snappy Note",
-      body: "<h1>Snappy Note</h1><p>Snappy Note is a simple note taking app that allows you to take notes and share them with others.</p>",
-      image: null,
-      delta: null,
-    },
-  ];
-
   const [currentId, setCurrentId] = useState<number>(0);
   const [remoteId, setRemoteId] = useState<string>("");
   const [notes, setNotes] = useState<INote[]>(initialNote);
@@ -53,14 +36,6 @@ function App() {
     );
     const data = await response.data;
     setRemoteId(data);
-  };
-
-  const addNote = () => {
-    setNotes((prevState) => [
-      ...prevState,
-      { id: prevState.length, title: "", body: "", image: null, delta: null },
-    ]);
-    setCurrentId(notes.length);
   };
 
   const handleChange = (index: number, value: string, delta: object) => {
@@ -85,17 +60,6 @@ function App() {
       };
       return updatedData;
     });
-  };
-
-  const delNote = (id: number) => {
-    if (notes.length === 1) return;
-    setCurrentId(id - 1);
-    setNotes((prevState) => prevState.filter((note) => note.id !== id));
-    const sanitizedUrl = window.location.href.replace(
-      /[&/\\#,+()$~%.'":*?<>{}]/g,
-      ""
-    );
-    localStorage.removeItem(`${sanitizedUrl}_note_${id}`);
   };
 
   useEffect(() => {
@@ -144,6 +108,7 @@ function App() {
             element={
               <Home
                 notes={notes}
+                setNotes={setNotes}
                 currNote={currNote}
                 handleChange={handleChange}
                 handleInputChange={handleInputChange}
