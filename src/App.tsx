@@ -10,55 +10,32 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./Pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Share from "./Pages/Share";
-
-interface INote {
-  id: number;
-  title: string;
-  body: string;
-  image: string | null;
-  delta: object | null;
-}
+import { initialNote, addNote, delNote, loadAllNotes, saveNote } from "./LocalStorage";
+import { INote } from "./Types";
 
 Quill.register("modules/imageResize", ImageResize);
 
 function App() {
   const [currentId, setCurrentId] = useState<number>(0);
   const [remoteId, setRemoteId] = useState<string>("");
-  const [notes, setNotes] = useState<INote[]>([
-    {
-      id: 0,
-      title: "asdf",
-      body: "asdf",
-      image: null,
-      delta: null,
-    },
-  ]);
+  const [notes, setNotes] = useState<INote[]>(initialNote);
   const [remote, setRemote] = useState<INote[]>([]);
 
   const postNote = async (note: INote, secret: string) => {
-    console.log(secret.trim())
+    console.log(secret.trim());
     console.log(note);
     const response = await axios.post(
       `${import.meta.env.VITE_BACKEND_URL}/post`,
       note,
       {
         headers: {
-          //"Content-Type": "application/json",
-          Authorization:secret.trim(),
+          "Content-Type": "application/json",
+          Authorization: secret.trim(),
         },
       }
     );
     const data = await response.data;
     setRemoteId(data);
-    //console.log(data);
-  };
-
-  const addNote = () => {
-    setNotes((prevState) => [
-      ...prevState,
-      { id: prevState.length, title: "", body: "", image: null, delta: null },
-    ]);
-    setCurrentId(notes.length);
   };
 
   const handleChange = (index: number, value: string, delta: object) => {
@@ -85,36 +62,21 @@ function App() {
     });
   };
 
-  const loadNote = () => {
-    const notes = localStorage.getItem("notes");
-    if (notes) {
-      setNotes(JSON.parse(notes));
-    }
-  };
-
-  const delNote = (id: number) => {
-    if (notes.length === 1) return;
-    setCurrentId(id - 1);
-    setNotes((prevState) => prevState.filter((note) => note.id !== id));
-  };
-
   useEffect(() => {
-    loadNote();
+    if (localStorage.length <= 1) return;
+    return setNotes(loadAllNotes());
   }, []);
 
-  const saveNote = () => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  };
+  const currNote = notes.find((note) => note.id === currentId);
 
   useEffect(() => {
-    saveNote();
+    console.log(currNote);
+    saveNote(notes, currentId, currNote);
   }, [notes, saveNote]);
 
   useEffect(() => {
     setRemoteId("");
   }, [currentId]);
-
-  const currNote = notes.find((note) => note.id === currentId);
 
   const fetchNotes = async (id: string, token: string): Promise<void> => {
     console.log(id);
@@ -124,7 +86,7 @@ function App() {
         `${import.meta.env.VITE_BACKEND_URL}/get/${id}`,
         {
           headers: {
-            "Authorization": token,
+            Authorization: token,
           },
         }
       );
@@ -146,6 +108,7 @@ function App() {
             element={
               <Home
                 notes={notes}
+                setNotes={setNotes}
                 currNote={currNote}
                 handleChange={handleChange}
                 handleInputChange={handleInputChange}
