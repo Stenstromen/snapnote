@@ -29,6 +29,7 @@ function Home({
   currentId,
   setCurrentId,
   remoteId,
+  setRemoteId,
 }: {
   notes: INote[];
   setNotes: React.Dispatch<React.SetStateAction<INote[]>>;
@@ -49,10 +50,15 @@ function Home({
     setNotes: React.Dispatch<React.SetStateAction<INote[]>>,
     id: number
   ) => void;
-  postNote: (note: INote, secret: string) => void;
+  postNote: (
+    note: INote,
+    secret: string,
+    setRemoteId: (remoteId: string) => void
+  ) => void;
   currentId: number;
   setCurrentId: React.Dispatch<React.SetStateAction<number>>;
   remoteId: string;
+  setRemoteId: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [show, setShow] = useState(false);
   const [password, setPassword] = useState("");
@@ -253,7 +259,7 @@ function Home({
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  postNote(currNote!, password);
+                  postNote(currNote!, password, setRemoteId);
                   manipulateAndEncode(password).then((encodedResult) => {
                     setEncodedPassword(encodedResult);
                   });
@@ -269,7 +275,7 @@ function Home({
               disabled={remoteId ? true : false}
               variant="primary"
               onClick={() => {
-                postNote(currNote!, password);
+                postNote(currNote!, password, setRemoteId);
                 manipulateAndEncode(password).then((encodedResult) => {
                   setEncodedPassword(encodedResult);
                 });

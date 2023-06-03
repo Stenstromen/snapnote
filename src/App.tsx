@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ChangeEvent, useEffect, useState } from "react";
-import axios from "axios";
 import { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
@@ -10,7 +9,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./Pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Share from "./Pages/Share";
-import { initialNote, addNote, delNote, loadAllNotes, saveNote } from "./LocalStorage";
+import {
+  initialNote,
+  addNote,
+  delNote,
+  loadAllNotes,
+  saveNote,
+} from "./LocalStorage";
+import { fetchNotes, postNote } from "./Api";
 import { INote } from "./Types";
 
 Quill.register("modules/imageResize", ImageResize);
@@ -20,23 +26,7 @@ function App() {
   const [remoteId, setRemoteId] = useState<string>("");
   const [notes, setNotes] = useState<INote[]>(initialNote);
   const [remote, setRemote] = useState<INote[]>([]);
-
-  const postNote = async (note: INote, secret: string) => {
-    console.log(secret.trim());
-    console.log(note);
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/post`,
-      note,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: secret.trim(),
-        },
-      }
-    );
-    const data = await response.data;
-    setRemoteId(data);
-  };
+  const currNote = notes.find((note) => note.id === currentId);
 
   const handleChange = (index: number, value: string, delta: object) => {
     setNotes((prevState) => {
@@ -67,37 +57,13 @@ function App() {
     return setNotes(loadAllNotes());
   }, []);
 
-  const currNote = notes.find((note) => note.id === currentId);
-
   useEffect(() => {
-    console.log(currNote);
     saveNote(notes, currentId, currNote);
   }, [notes, saveNote]);
 
   useEffect(() => {
     setRemoteId("");
   }, [currentId]);
-
-  const fetchNotes = async (id: string, token: string): Promise<void> => {
-    console.log(id);
-    console.log(token);
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/get/${id}`,
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
-      );
-      const data = response.data;
-      setRemote((remote) => [...remote, data]);
-      console.log("fetching remote");
-      console.log(data);
-    } catch (error) {
-      console.error("Error fetching notes:", error);
-    }
-  };
 
   return (
     <div className="d-flex w-100 main">
@@ -118,12 +84,19 @@ function App() {
                 currentId={currentId}
                 setCurrentId={setCurrentId}
                 remoteId={remoteId}
+                setRemoteId={setRemoteId}
               />
             }
           />
           <Route
             path="/share/:id/:token"
-            element={<Share remote={remote} fetchNotes={fetchNotes} />}
+            element={
+              <Share
+                remote={remote}
+                setRemote={setRemote}
+                fetchNotes={fetchNotes}
+              />
+            }
           />
         </Routes>
       </BrowserRouter>
