@@ -12,24 +12,34 @@ interface INote {
 
 function Share({
   remote,
+  setRemote,
   fetchNotes,
 }: {
   remote: INote[];
-  fetchNotes: (id: string, token: string) => void;
+  setRemote: (remote: INote[] | ((remote: INote[]) => INote[])) => void;
+  fetchNotes: (
+    id: string,
+    token: string,
+    setRemote: (remote: INote[] | ((remote: INote[]) => INote[])) => void
+  ) => void;
+  
 }) {
   const { id, token } = useParams<{ token: string; id: string }>();
 
   function decodeAndManipulate(encodedString: string): string {
     const decodedString = atob(encodedString);
     const randomStringLength = 16;
-    const originalString = decodedString.substring(randomStringLength, decodedString.length - randomStringLength);
-  
+    const originalString = decodedString.substring(
+      randomStringLength,
+      decodedString.length - randomStringLength
+    );
+
     return originalString;
   }
 
   useEffect(() => {
     if (id && token) {
-      fetchNotes(id, decodeAndManipulate(token));
+      fetchNotes(id, decodeAndManipulate(token), setRemote);
     }
   }, [id, token]);
 
