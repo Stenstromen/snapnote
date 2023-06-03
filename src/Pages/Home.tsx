@@ -8,6 +8,7 @@ import Sidebar from "../Components/Sidebar";
 import { readAndCompressImage } from "browser-image-resizer";
 import { AiOutlineSave, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
+import { imageConfig, modules, formats } from "../Quill";
 
 interface INote {
   id: number;
@@ -66,52 +67,6 @@ function Home({
 
   const quillRef = useRef<ReactQuill | null>(null);
 
-  const config = {
-    quality: 0.7,
-    maxWidth: 800,
-    maxHeight: 800,
-    autoRotate: true,
-    debug: true,
-  };
-
-  const modules = {
-    toolbar: [
-      [{ font: [] }],
-      [{ size: ["small", false, "large", "huge"] }],
-      [{ header: 1 }],
-      [{ header: 2 }],
-      [{ color: [] }, { background: [] }],
-      ["blockquote", "code-block"],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }, { align: [] }],
-      ["link", "image"],
-      ["clean"],
-    ],
-    imageResize: {
-      modules: ["Resize", "DisplaySize"],
-    },
-  };
-
-  const formats = [
-    "font",
-    "size",
-    "header",
-    "color",
-    "background",
-    "blockquote",
-    "code-block",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "bullet",
-    "align",
-    "image",
-    "link",
-    "clean",
-  ];
-
   async function generateRandomBytes(length: number): Promise<Uint8Array> {
     const crypto = window.crypto || window.Crypto;
 
@@ -125,16 +80,13 @@ function Home({
   }
 
   async function manipulateAndEncode(input: string): Promise<string> {
-    // Generate 8 random characters
     const randomBytesResult = await generateRandomBytes(8);
     const randomString = Array.from(randomBytesResult)
       .map((byte) => byte.toString(16))
       .join("");
 
-    // Prepend and append the random characters to the input
     const manipulatedString = randomString + input + randomString;
 
-    // Encode the manipulated string to base64
     const encodedString = btoa(manipulatedString);
 
     return encodedString;
@@ -144,9 +96,7 @@ function Home({
     if (quillRef.current != null) {
       const quill = quillRef.current.getEditor();
 
-      // Add the custom handler here
       quill.getModule("toolbar").addHandler("image", () => {
-        // trigger the file input dialog
         const fileInput = document.createElement("input");
         fileInput.setAttribute("type", "file");
         fileInput.click();
@@ -158,18 +108,17 @@ function Home({
           }
           const file = fileInput.files[0];
 
-          // compress and resize the image
           try {
-            const compressedFile = await readAndCompressImage(file, config);
+            const compressedFile = await readAndCompressImage(
+              file,
+              imageConfig
+            );
 
-            // convert the Blob into a data URL
             const reader = new FileReader();
             reader.onload = function (e) {
-              // get the cursor position
               const range = quill.getSelection();
               const position = range ? range.index : 0;
 
-              // insert the image
               if (e.target === null) {
                 console.warn("No target");
                 return;
@@ -231,7 +180,7 @@ function Home({
             </div>
 
             <ReactQuill
-              ref={quillRef} // Pass the ref to the Quill component
+              ref={quillRef}
               value={currNote?.body}
               onChange={(value, _delta, _source, editor) =>
                 handleChange(currNote?.id || 0, value, editor.getContents())
