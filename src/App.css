@@ -2,6 +2,10 @@ body {
   background-color: #f9fbfd !important;
 }
 
+.button {
+  padding: .5rem !important;
+}
+
 .ql-toolbar {
   margin-top: 10px !important;
   background-color: lightgray;
@@ -17,12 +21,17 @@ body {
   height: 1123px;
   width: 800px !important;
   margin: auto;
-  padding: 100px;
+  padding: 101px;
   overflow-y: scroll !important;
 }
 
+.ql-editor p,
+.ql-editor ol,
+.ql-editor ul,
+.ql-editor pre,
+.ql-editor blockquote,
 .ql-container {
-  height: 70vh;
+  font-size: 15px;
 }
 
 .ql-container.ql-snow {
@@ -91,6 +100,10 @@ body {
   }
   .sidebar-content {
     flex-direction: row-reverse;
+  }
+
+  .button {
+    padding: .25rem !important;
   }
 
   .ql-toolbar {
