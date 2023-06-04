@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { Button, InputGroup } from "react-bootstrap";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import Sidebar from "../Components/Sidebar";
 import { readAndCompressImage } from "browser-image-resizer";
 import { AiOutlineSave, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
-import { imageConfig, modules, formats } from "../Quill";
+import Sidebar from "../Components/Sidebar";
 import ShareModal from "../Components/ShareModal";
+import { imageConfig, modules, formats } from "../Quill";
+import "react-quill/dist/quill.snow.css";
 import { IHomeProps } from "../Types";
 
 function Home({
