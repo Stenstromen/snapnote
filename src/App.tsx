@@ -28,11 +28,16 @@ function App() {
   const [remote, setRemote] = useState<INote[]>([]);
   const currNote = notes.find((note) => note.id === currentId);
 
-  const handleChange = (index: number, value: string, delta: object) => {
+  const handleChange = (id: number, value: string, delta: object) => {
     setNotes((prevState) => {
       const updatedData = [...prevState];
-      updatedData[index].body = value;
-      updatedData[index].delta = delta;
+      const noteIndex = updatedData.findIndex((note) => note.id === id);
+
+      if (noteIndex !== -1) {
+        updatedData[noteIndex].body = value;
+        updatedData[noteIndex].delta = delta;
+      }
+
       return updatedData;
     });
   };
