@@ -46,3 +46,15 @@ export interface IShareProps {
     setRemote: (remote: INote[] | ((remote: INote[]) => INote[])) => void
   ) => void;
 }
+
+export interface IShareModalProps {
+  show: boolean;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+  currNote: INote | undefined;
+  remoteId: string | null;
+  setRemoteId: React.Dispatch<React.SetStateAction<string>>;
+  password: string;
+  setPassword: React.Dispatch<React.SetStateAction<string>>;
+  encodedPassword: string;
+  setEncodedPassword: React.Dispatch<React.SetStateAction<string>>;
+}
