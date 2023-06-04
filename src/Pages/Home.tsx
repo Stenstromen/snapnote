@@ -100,13 +100,13 @@ function Home({
                 style={{ marginLeft: "auto" }}
               >
                 <Button
-                  className="p-2"
+                  className="button"
                   onClick={() => addNote(notes, setNotes, setCurrentId)}
                 >
                   <HiOutlineDocumentPlus size={22} />&nbsp;New
                 </Button>
                 <Button
-                  className="p-2"
+                  className="button"
                   variant="warning"
                   onClick={() =>
                     delNote(notes, setCurrentId, setNotes, currNote?.id || 0)
@@ -114,7 +114,7 @@ function Home({
                 >
                   <AiOutlineDelete size={22} />&nbsp;Delete
                 </Button>
-                <Button className="p-2" onClick={() => setShow(!show)}>
+                <Button className="button" onClick={() => setShow(!show)}>
                   <AiOutlineSave size={22} />&nbsp;Save
                 </Button>
               </div>
