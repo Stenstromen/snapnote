@@ -1,29 +1,9 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
+import { IShareProps } from "../Types";
 
-interface INote {
-  id: number;
-  title: string;
-  body: string;
-  image: string | null;
-  delta: object | null;
-}
-
-function Share({
-  remote,
-  setRemote,
-  fetchNotes,
-}: {
-  remote: INote[];
-  setRemote: (remote: INote[] | ((remote: INote[]) => INote[])) => void;
-  fetchNotes: (
-    id: string,
-    token: string,
-    setRemote: (remote: INote[] | ((remote: INote[]) => INote[])) => void
-  ) => void;
-  
-}) {
+function Share({ remote, setRemote, fetchNotes }: IShareProps) {
   const { id, token } = useParams<{ token: string; id: string }>();
 
   function decodeAndManipulate(encodedString: string): string {
