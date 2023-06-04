@@ -85,9 +85,9 @@ function Home({
             className="d-flex p-2 flex-column editor-content"
             key={currNote?.id}
           >
-            <div className="d-flex ">
+            <div className="d-flex" style={{ width: "94vw" }}>
               <Form.Control
-                className="w-50 d-flex"
+                className="title-w d-flex"
                 name="title"
                 value={currNote?.title}
                 as="input"
@@ -95,38 +95,48 @@ function Home({
                 placeholder="asdfsadf"
               />
               &nbsp;
-              <div className="flex-end">
+              <div
+                className="flex-end"
+                style={{ marginLeft: "auto" }}
+              >
                 <Button
-                  className="p-1"
+                  className="p-2"
                   onClick={() => addNote(notes, setNotes, setCurrentId)}
                 >
-                  <HiOutlineDocumentPlus size={22} />
+                  <HiOutlineDocumentPlus size={22} />&nbsp;New
                 </Button>
                 <Button
-                  className="p-1"
+                  className="p-2"
                   variant="warning"
                   onClick={() =>
                     delNote(notes, setCurrentId, setNotes, currNote?.id || 0)
                   }
                 >
-                  <AiOutlineDelete size={22} />
+                  <AiOutlineDelete size={22} />&nbsp;Delete
                 </Button>
-                <Button className="p-1" onClick={() => setShow(!show)}>
-                  <AiOutlineSave size={22} />
+                <Button className="p-2" onClick={() => setShow(!show)}>
+                  <AiOutlineSave size={22} />&nbsp;Save
                 </Button>
               </div>
             </div>
 
-            <ReactQuill
-              ref={quillRef}
-              value={currNote?.body}
-              onChange={(value, _delta, _source, editor) =>
-                handleChange(currNote?.id || 0, value, editor.getContents())
-              }
-              modules={modules}
-              formats={formats}
-              placeholder="Body"
-            />
+            <div
+              style={{
+                display: "flex",
+              }}
+            >
+              <ReactQuill
+                ref={quillRef}
+                value={currNote?.body}
+                onChange={(value, _delta, _source, editor) =>
+                  handleChange(currNote?.id || 0, value, editor.getContents())
+                }
+                modules={modules}
+                formats={formats}
+                placeholder="Body"
+              />
+            </div>
+
             {currNote?.image && <img src={currNote?.image} alt="Uploaded" />}
           </div>
         </InputGroup>
