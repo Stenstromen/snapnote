@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
-import { Stack, Button, InputGroup, Modal, Nav } from "react-bootstrap";
+import { Button, InputGroup } from "react-bootstrap";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Sidebar from "../Components/Sidebar";
@@ -9,6 +8,7 @@ import { readAndCompressImage } from "browser-image-resizer";
 import { AiOutlineSave, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
 import { imageConfig, modules, formats } from "../Quill";
+import ShareModal from "../Components/ShareModal";
 import { IHomeProps } from "../Types";
 
 function Home({
@@ -19,7 +19,6 @@ function Home({
   handleInputChange,
   addNote,
   delNote,
-  postNote,
   currentId,
   setCurrentId,
   remoteId,
@@ -30,31 +29,6 @@ function Home({
   const [encodedPassword, setEncodedPassword] = useState("");
 
   const quillRef = useRef<ReactQuill | null>(null);
-
-  async function generateRandomBytes(length: number): Promise<Uint8Array> {
-    const crypto = window.crypto || window.Crypto;
-
-    if (!crypto || !crypto.getRandomValues) {
-      throw new Error("Web Crypto API not available.");
-    }
-
-    const randomBytes = new Uint8Array(length);
-    crypto.getRandomValues(randomBytes);
-    return randomBytes;
-  }
-
-  async function manipulateAndEncode(input: string): Promise<string> {
-    const randomBytesResult = await generateRandomBytes(8);
-    const randomString = Array.from(randomBytesResult)
-      .map((byte) => byte.toString(16))
-      .join("");
-
-    const manipulatedString = randomString + input + randomString;
-
-    const encodedString = btoa(manipulatedString);
-
-    return encodedString;
-  }
 
   useEffect(() => {
     if (quillRef.current != null) {
@@ -156,66 +130,17 @@ function Home({
             {currNote?.image && <img src={currNote?.image} alt="Uploaded" />}
           </div>
         </InputGroup>
-        <Modal size="lg" centered show={show} onHide={() => setShow(!show)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Save Note</Modal.Title>
-          </Modal.Header>
-          <Stack direction="horizontal">
-            <Modal.Body>Pass:</Modal.Body>
-            <Form.Control
-              autoFocus
-              disabled={remoteId ? true : false}
-              type="password"
-              id="inputPassword5"
-              aria-describedby="passwordHelpBlock"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  postNote(currNote!, password, setRemoteId);
-                  manipulateAndEncode(password).then((encodedResult) => {
-                    setEncodedPassword(encodedResult);
-                  });
-                }
-              }}
-            />
-          </Stack>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShow(!show)}>
-              Close
-            </Button>
-            <Button
-              disabled={remoteId ? true : false}
-              variant="primary"
-              onClick={() => {
-                postNote(currNote!, password, setRemoteId);
-                manipulateAndEncode(password).then((encodedResult) => {
-                  setEncodedPassword(encodedResult);
-                });
-              }}
-            >
-              Save Changes
-            </Button>
-          </Modal.Footer>
-          <Modal.Footer>
-            {remoteId ? (
-              <Nav variant="pills" activeKey="1">
-                <Nav.Item>
-                  <Nav.Link
-                    target="_blank"
-                    href={`${
-                      window.document.URL
-                    }share/${remoteId.trim()}/${encodedPassword}`}
-                  >
-                    {`${
-                      window.document.URL
-                    }share/${remoteId.trim()}/${encodedPassword}`}
-                  </Nav.Link>
-                </Nav.Item>
-              </Nav>
-            ) : null}
-          </Modal.Footer>
-        </Modal>
+        <ShareModal
+          show={show}
+          setShow={setShow}
+          currNote={currNote}
+          remoteId={remoteId}
+          setRemoteId={setRemoteId}
+          password={password}
+          setPassword={setPassword}
+          encodedPassword={encodedPassword}
+          setEncodedPassword={setEncodedPassword}
+        />
       </div>
     </>
   );
