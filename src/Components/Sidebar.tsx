@@ -20,7 +20,7 @@ function Sidebar({
               className="nav-link-custom"
               key={id}
               onClick={() => setCurrentId(id)}
-              style={{ color: id === currentId ? "Green" : "White" }}
+              style={{ color: id === currentId ? "Green" : "#d3d3d3" }}
             >
               {title[0] ? (
                 <HiOutlineDocumentText size={iconSize} />

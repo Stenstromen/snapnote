@@ -25,9 +25,12 @@ function Share({ remote, setRemote, fetchNotes }: IShareProps) {
   }, [id, token]);
 
   return (
-    <div className="d-flex editor">
+    <div className="d-flex"
+    style={{
+      margin: "0 auto",
+    }}>
       <div
-        className="d-flex p-2 flex-column editor-content"
+        className="d-flex flex-column editor-content"
         key={remote[0]?.id}
       >
         <h1 className="share-title">{remote[0]?.title}</h1>
