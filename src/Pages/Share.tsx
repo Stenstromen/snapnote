@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
