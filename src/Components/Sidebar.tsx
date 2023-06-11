@@ -4,6 +4,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDocumentText, HiOutlineDocument } from "react-icons/hi";
 import { INote } from "../Types";
 import { delNote } from "../LocalStorage";
+import memo from "./memo.png";
 
 function Sidebar({
   notes,
@@ -25,7 +26,7 @@ function Sidebar({
     <div className="ms-2 w-100 mt-2">
       <Nav>
         <Button variant="outline-secondary" onClick={toggleShow}>
-          <img src="/memo.png" alt="logo" width="30" />
+          <img src={memo} alt="logo" width="30" />
         </Button>
         <h4 className="m-2 text-success">SnapNote.Online</h4>
         <Offcanvas show={show} scroll backdrop onHide={handleClose}>
