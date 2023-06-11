@@ -33,7 +33,7 @@ function Share({ remote, setRemote, fetchNotes }: IShareProps) {
         className="d-flex flex-column editor-content"
         key={remote[0]?.id}
       >
-        <h1 className="share-title">{remote[0]?.title}</h1>
+        <h1 className="text-dark">{remote[0]?.title}</h1>
         <ReactQuill
           value={remote[0]?.body}
           readOnly={true}

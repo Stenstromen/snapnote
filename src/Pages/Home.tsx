@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
-import { Button, InputGroup } from "react-bootstrap";
+import { Button, Dropdown, InputGroup } from "react-bootstrap";
 import ReactQuill from "react-quill";
 import { readAndCompressImage } from "browser-image-resizer";
 import { AiOutlineSave, AiOutlineDelete } from "react-icons/ai";
@@ -73,53 +73,90 @@ function Home({
   }, []);
 
   return (
-    <>
+    <div className="d-flex flex-column">
       <Sidebar
         notes={notes}
+        setNotes={setNotes}
         currentId={currentId}
         setCurrentId={setCurrentId}
       />
-      <div className="d-flex editor">
+      <div className="d-flex w-100">
         <InputGroup>
           <div
-            className="d-flex p-2 flex-column editor-content"
+            className="d-flex p-2 flex-column w-100 h-100"
             key={currNote?.id}
           >
-            <div className="d-flex" style={{ width: "94vw" }}>
+            <div className="d-flex w-100">
               <Form.Control
-                className="title-w d-flex"
+                className="w-50 d-flex"
                 name="title"
                 value={currNote?.title}
                 as="input"
                 onChange={(e) => handleInputChange(currNote?.id || 0, e)}
-                placeholder="asdfsadf"
+                placeholder="Document Title"
               />
               &nbsp;
-              <div
-                className="flex-end"
-                style={{ marginLeft: "auto" }}
-              >
-                <Button
-                  className="button"
-                  onClick={() => addNote(notes, setNotes, setCurrentId)}
-                >
-                  <HiOutlineDocumentPlus size={22} />&nbsp;New
-                </Button>
-                <Button
-                  className="button"
-                  variant="warning"
-                  onClick={() =>
-                    delNote(notes, setCurrentId, setNotes, currNote?.id || 0)
-                  }
-                >
-                  <AiOutlineDelete size={22} />&nbsp;Delete
-                </Button>
-                <Button className="button" onClick={() => setShow(!show)}>
-                  <AiOutlineSave size={22} />&nbsp;Save
-                </Button>
+              <div className="d-flex align-items-end justify-content-end w-50">
+                <div className="d-none d-sm-block">
+                  <Button
+                    className="p-1 p-sm-2"
+                    onClick={() => {
+                      currNote?.title && addNote(notes, setNotes, setCurrentId);
+                    }}
+                  >
+                    <HiOutlineDocumentPlus size={22} />
+                    &nbsp;New
+                  </Button>
+                  <Button
+                    className="p-1 p-sm-2"
+                    variant="warning"
+                    onClick={() =>
+                      delNote(notes, setCurrentId, setNotes, currNote?.id || 0)
+                    }
+                  >
+                    <AiOutlineDelete size={22} />
+                    &nbsp;Delete
+                  </Button>
+                  <Button className="p-1 p-sm-2" onClick={() => setShow(!show)}>
+                    <AiOutlineSave size={22} />
+                    &nbsp;Save
+                  </Button>
+                </div>
+                <div className="d-block d-sm-none">
+                  <Dropdown>
+                    <Dropdown.Toggle variant="success" id="dropdown-basic">
+                      Actions
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item
+                        onClick={() => {
+                          currNote?.title &&
+                            addNote(notes, setNotes, setCurrentId);
+                        }}
+                      >
+                        New
+                      </Dropdown.Item>
+                      <Dropdown.Item
+                        onClick={() =>
+                          delNote(
+                            notes,
+                            setCurrentId,
+                            setNotes,
+                            currNote?.id || 0
+                          )
+                        }
+                      >
+                        Delete
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => setShow(!show)}>
+                        Save
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
               </div>
             </div>
-
             <div
               style={{
                 display: "flex",
@@ -133,7 +170,6 @@ function Home({
                 }
                 modules={modules}
                 formats={formats}
-                placeholder="Body"
               />
             </div>
 
@@ -152,7 +188,7 @@ function Home({
           setEncodedPassword={setEncodedPassword}
         />
       </div>
-    </>
+    </div>
   );
 }
 
