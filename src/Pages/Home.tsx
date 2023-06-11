@@ -7,7 +7,7 @@ import { AiOutlineSave, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
 import Sidebar from "../Components/Sidebar";
 import ShareModal from "../Components/ShareModal";
-import { imageConfig, modules, formats } from "../Quill";
+import { imageConfig, moreOptions, lessOptions, formats } from "../Quill";
 import "react-quill/dist/quill.snow.css";
 import { IHomeProps } from "../Types";
 
@@ -27,14 +27,31 @@ function Home({
   const [show, setShow] = useState(false);
   const [password, setPassword] = useState("");
   const [encodedPassword, setEncodedPassword] = useState("");
+  const [modules, setModules] = useState({
+    toolbar: moreOptions,
+    imageResize: {
+      modules: ["Resize", "DisplaySize"],
+    },
+  });
   const stickyStyle: React.CSSProperties = {
     position: "sticky",
     top: "50px",
     zIndex: "1001",
     backgroundColor: "#f9fbfd",
   };
-
   const quillRef = useRef<ReactQuill | null>(null);
+
+  useEffect(() => {
+    function handleResize() {
+      const isMobile = window.innerWidth <= 450;
+      setModules((prevModules) => ({
+        ...prevModules,
+        toolbar: isMobile ? lessOptions : moreOptions,
+      }));
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (quillRef.current != null) {
@@ -165,6 +182,7 @@ function Home({
             </div>
             <div className="d-flex">
               <ReactQuill
+                key={modules.toolbar.length}
                 ref={quillRef}
                 value={currNote?.body}
                 onChange={(value, _delta, _source, editor) =>
