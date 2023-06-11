@@ -29,14 +29,20 @@ export const delNote = (
   id: number
 ) => {
   if (notes.length === 1) return;
-  setCurrentId(id - 1);
-  setNotes((prevState: INote[]) => prevState.filter((note) => note.id !== id));
+
+  const newNotes = notes.filter((note) => note.id !== id);
+  setNotes(newNotes);
+
+  const nextNote = newNotes[newNotes.length - 1];
+  setCurrentId(nextNote ? nextNote.id : 0);
+
   const sanitizedUrl = window.location.href.replace(
     /[&/\\#,+()$~%.'":*?<>{}]/g,
     ""
   );
   localStorage.removeItem(`${sanitizedUrl}_note_${id}`);
 };
+
 
 export const loadAllNotes = () => {
   const sanitizedUrl = window.location.href.replace(

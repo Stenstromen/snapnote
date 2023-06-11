@@ -71,7 +71,7 @@ function App() {
   }, [currentId]);
 
   return (
-    <div className="d-flex w-100 main">
+    <div className="d-flex flex-column flex-md-row w-100">
       <BrowserRouter>
         <Routes>
           <Route
