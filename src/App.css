@@ -3,6 +3,9 @@ body {
 }
 
 .ql-toolbar {
+  position: sticky;
+  top: 100px;
+  z-index: 1000;
   margin-top: 10px !important;
   background-color: lightgray;
   border-radius: 24px;

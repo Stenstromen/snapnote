@@ -27,6 +27,12 @@ function Home({
   const [show, setShow] = useState(false);
   const [password, setPassword] = useState("");
   const [encodedPassword, setEncodedPassword] = useState("");
+  const stickyStyle: React.CSSProperties = {
+    position: "sticky",
+    top: "50px",
+    zIndex: "1001",
+    backgroundColor: "#f9fbfd",
+  };
 
   const quillRef = useRef<ReactQuill | null>(null);
 
@@ -86,7 +92,7 @@ function Home({
             className="d-flex p-2 flex-column w-100 h-100"
             key={currNote?.id}
           >
-            <div className="d-flex w-100">
+            <div className="d-flex w-100" style={stickyStyle}>
               <Form.Control
                 className="w-50 d-flex"
                 name="title"
@@ -157,11 +163,7 @@ function Home({
                 </div>
               </div>
             </div>
-            <div
-              style={{
-                display: "flex",
-              }}
-            >
+            <div className="d-flex">
               <ReactQuill
                 ref={quillRef}
                 value={currNote?.body}
@@ -170,6 +172,7 @@ function Home({
                 }
                 modules={modules}
                 formats={formats}
+                style={{ position: "sticky", top: "0" }}
               />
             </div>
 

@@ -19,11 +19,17 @@ function Sidebar({
 }) {
   const [show, setShow] = useState(false);
   const iconSize = 28;
+  const stickyStyle: React.CSSProperties = {
+    position: "sticky",
+    top: "0",
+    zIndex: "1002",
+    backgroundColor: "#f9fbfd",
+  };
   const handleClose = () => setShow(false);
   const toggleShow = () => setShow((s) => !s);
 
   return (
-    <div className="ms-2 w-100 mt-2">
+    <div className="ms-2 w-100 mt-2" style={stickyStyle}>
       <Nav>
         <Button variant="outline-secondary" onClick={toggleShow}>
           <img src={memo} alt="logo" width="30" />
