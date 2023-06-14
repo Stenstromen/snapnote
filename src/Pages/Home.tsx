@@ -42,6 +42,12 @@ function Home({
   const quillRef = useRef<ReactQuill | null>(null);
 
   useEffect(() => {
+    if (quillRef && quillRef.current) {
+      quillRef.current.getEditor().focus();
+    }
+  }, [currentId]);
+
+  useEffect(() => {
     function handleResize() {
       const isMobile = window.innerWidth <= 450;
       setModules((prevModules) => ({
@@ -57,6 +63,7 @@ function Home({
   useEffect(() => {
     if (quillRef.current != null) {
       const quill = quillRef.current.getEditor();
+      quillRef.current.getEditor().focus();
 
       quill.getModule("toolbar").addHandler("image", () => {
         const fileInput = document.createElement("input");
