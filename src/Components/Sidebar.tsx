@@ -24,6 +24,7 @@ function Sidebar({
     top: "0",
     zIndex: "1002",
     backgroundColor: "#f9fbfd",
+    paddingBottom: ".32rem",
   };
   const handleClose = () => setShow(false);
   const toggleShow = () => setShow((s) => !s);

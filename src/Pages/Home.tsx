@@ -38,6 +38,7 @@ function Home({
     top: "50px",
     zIndex: "1001",
     backgroundColor: "#f9fbfd",
+    paddingBottom: "7px",
   };
   const quillRef = useRef<ReactQuill | null>(null);
 
