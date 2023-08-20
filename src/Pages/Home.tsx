@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { Button, Dropdown, InputGroup } from "react-bootstrap";
 import ReactQuill from "react-quill";
+import { Modal, Stack } from "react-bootstrap";
 import { readAndCompressImage } from "browser-image-resizer";
-import { AiOutlineSave, AiOutlineDelete } from "react-icons/ai";
+import { AiOutlineSave, AiOutlineDelete, AiOutlineCloudDownload } from "react-icons/ai";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
 import Sidebar from "../Components/Sidebar";
 import ShareModal from "../Components/ShareModal";
+import { loadNote } from "../Api";
 import { imageConfig, moreOptions, lessOptions, formats } from "../Quill";
 import "react-quill/dist/quill.snow.css";
 import { IHomeProps } from "../Types";
@@ -25,6 +27,8 @@ function Home({
   setRemoteId,
 }: IHomeProps) {
   const [show, setShow] = useState(false);
+  const [showLoad, setShowLoad] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
   const [password, setPassword] = useState("");
   const [encodedPassword, setEncodedPassword] = useState("");
   const [modules, setModules] = useState({
@@ -41,6 +45,17 @@ function Home({
     paddingBottom: "7px",
   };
   const quillRef = useRef<ReactQuill | null>(null);
+
+  function decodeAndManipulate(encodedString: string): string {
+    const decodedString = atob(encodedString);
+    const randomStringLength = 16;
+    const originalString = decodedString.substring(
+      randomStringLength,
+      decodedString.length - randomStringLength
+    );
+
+    return originalString;
+  }
 
   useEffect(() => {
     if (quillRef && quillRef.current) {
@@ -153,6 +168,13 @@ function Home({
                     <AiOutlineSave size={22} />
                     &nbsp;Save
                   </Button>
+                  <Button
+                    className="p-1 p-sm-2"
+                    onClick={() => setShowLoad(!showLoad)}
+                  >
+                    <AiOutlineCloudDownload size={22} />
+                    &nbsp;Load
+                  </Button>
                 </div>
                 <div className="d-block d-sm-none">
                   <Dropdown>
@@ -218,6 +240,85 @@ function Home({
           setEncodedPassword={setEncodedPassword}
         />
       </div>
+      <Modal
+        size="lg"
+        centered
+        show={showLoad}
+        onHide={() => setShowLoad(!showLoad)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Load Note</Modal.Title>
+        </Modal.Header>
+        <Stack direction="horizontal">
+          <Modal.Body>URL:</Modal.Body>
+          <Form.Control
+            autoFocus
+            disabled={remoteId ? true : false}
+            type="input"
+            id="inputUrl"
+            aria-describedby="URL"
+            value={shareUrl}
+            onChange={(e) => setShareUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const url = new URL(shareUrl);
+                const remoteId = url.pathname.split("/")[2];
+                const encodedPassword = url.pathname.split("/")[3];
+                const loadedNote = loadNote(
+                  remoteId,
+                  decodeAndManipulate(encodedPassword)
+                );
+                loadedNote.then((resolvedNote) => {
+                  if (resolvedNote) {
+                    setNotes([
+                      {
+                        id: currNote?.id || 0,
+                        title: resolvedNote.title,
+                        body: resolvedNote.body,
+                        image: resolvedNote.image,
+                        delta: null,
+                      },
+                    ]);
+                  }
+                });
+              }
+            }}
+          />
+        </Stack>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowLoad(!showLoad)}>
+            Close
+          </Button>
+          <Button
+            disabled={remoteId ? true : false}
+            variant="primary"
+            onClick={() => {
+              const url = new URL(shareUrl);
+              const remoteId = url.pathname.split("/")[2];
+              const encodedPassword = url.pathname.split("/")[3];
+              const loadedNote = loadNote(
+                remoteId,
+                decodeAndManipulate(encodedPassword)
+              );
+              loadedNote.then((resolvedNote) => {
+                if (resolvedNote) {
+                  setNotes([
+                    {
+                      id: currNote?.id || 0,
+                      title: resolvedNote.title,
+                      body: resolvedNote.body,
+                      image: resolvedNote.image,
+                      delta: null,
+                    },
+                  ]);
+                }
+              });
+            }}
+          >
+            Load
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

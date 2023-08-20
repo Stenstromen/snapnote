@@ -40,3 +40,24 @@ export const fetchNotes = async (
     console.error("Error fetching notes:", error);
   }
 };
+
+export const loadNote = async (
+  id: string,
+  token: string,
+): Promise<INote | undefined> => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/get/${id}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+    //const data = response.data;
+    //setRemote((remote) => [...remote, data]);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching notes:", error);
+  }
+};
