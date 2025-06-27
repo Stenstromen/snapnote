@@ -14,12 +14,12 @@
     "bootstrap": "^5.2.3",
     "browser-image-resizer": "^2.4.1",
     "crypto": "^1.0.1",
+    "quill": "^2.0.3",
     "quill-image-resize-module-react": "^3.0.0",
     "react": "^19.1.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^19.1.0",
     "react-icons": "^4.9.0",
-    "react-quill": "^2.0.0",
     "react-router-dom": "^6.11.2"
   },
   "devDependencies": {

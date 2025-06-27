@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ChangeEvent, useEffect, useState } from "react";
-import { Quill } from "react-quill";
+import Quill from "quill";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ImageResize from "quill-image-resize-module-react";
 import Home from "./Pages/Home";
@@ -15,7 +15,7 @@ import {
 } from "./LocalStorage";
 import { fetchNotes, postNote } from "./Api";
 import { INote } from "./Types";
-import "react-quill/dist/quill.snow.css";
+import "quill/dist/quill.snow.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
@@ -58,8 +58,10 @@ function App() {
   };
 
   useEffect(() => {
-    if (localStorage.length <= 1) return;
-    return setNotes(loadAllNotes());
+    const savedNotes = loadAllNotes();
+    if (savedNotes.length > 0) {
+      setNotes(savedNotes);
+    }
   }, []);
 
   useEffect(() => {

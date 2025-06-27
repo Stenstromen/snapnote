@@ -4,7 +4,14 @@ export const initialNote = [
   {
     id: 0,
     title: "Snappy Note",
-    body: "<h1>Snappy Note</h1><p>Snappy Note is a simple note taking app that allows you to take notes and share them with others.</p>",
+    body: {
+      ops: [
+        { insert: "Snappy Note", attributes: { header: 1 } },
+        { insert: "\n" },
+        { insert: "Snappy Note is a simple note taking app that allows you to take notes and share them with others." },
+        { insert: "\n" }
+      ]
+    },
     image: null,
     delta: null,
   },
@@ -17,7 +24,13 @@ export const addNote = (
 ) => {
   setNotes((prevState: INote[]) => [
     ...prevState,
-    { id: prevState.length, title: "", body: "", image: null, delta: null },
+    { 
+      id: prevState.length, 
+      title: "", 
+      body: { ops: [{ insert: "\n" }] }, 
+      image: null, 
+      delta: null 
+    },
   ]);
   setCurrentId(notes.length);
 };

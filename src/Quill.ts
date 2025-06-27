@@ -46,10 +46,8 @@ export const formats = [
   "underline",
   "strike",
   "list",
-  "bullet",
   "align",
   "image",
   "link",
   "video",
-  "clean",
 ];

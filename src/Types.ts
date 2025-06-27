@@ -1,7 +1,7 @@
 export interface INote {
   id: number;
   title: string;
-  body: string;
+  body: string | { ops: any[] };
   image: string | null;
   delta: object | null;
 }
