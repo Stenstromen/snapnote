@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import ReactQuill from "react-quill";
+import QuillEditor from "../Components/QuillEditor";
 import { IShareProps } from "../Types";
 
 function Share({ remote, setRemote, fetchNotes }: IShareProps) {
@@ -25,19 +25,13 @@ function Share({ remote, setRemote, fetchNotes }: IShareProps) {
   }, [id, token]);
 
   return (
-    <div className="d-flex"
-    style={{
-      margin: "0 auto",
-    }}>
-      <div
-        className="d-flex flex-column editor-content"
-        key={remote[0]?.id}
-      >
+    <div className="d-flex" style={{ margin: "0 auto" }}>
+      <div className="d-flex flex-column editor-content" key={remote[0]?.id}>
         <h1 className="text-dark">{remote[0]?.title}</h1>
-        <ReactQuill
-          value={remote[0]?.body}
+        <QuillEditor
+          value={remote[0]?.body || ""}
+          onChange={() => { /* no-op: editor is read-only */ }}
           readOnly={true}
-          theme="snow"
           modules={{ toolbar: false }}
         />
       </div>
