@@ -1,16 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { Button, Dropdown, InputGroup } from "react-bootstrap";
-import ReactQuill from "react-quill";
 import { Modal, Stack } from "react-bootstrap";
-import { readAndCompressImage } from "browser-image-resizer";
 import { AiOutlineSave, AiOutlineDelete, AiOutlineCloudDownload } from "react-icons/ai";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
 import Sidebar from "../Components/Sidebar";
 import ShareModal from "../Components/ShareModal";
 import { loadNote } from "../Api";
-import { imageConfig, moreOptions, lessOptions, formats } from "../Quill";
-import "react-quill/dist/quill.snow.css";
+import { moreOptions, lessOptions, formats } from "../Quill";
+import QuillEditor from "../Components/QuillEditor";
 import { IHomeProps } from "../Types";
 
 function Home({
@@ -44,7 +42,6 @@ function Home({
     backgroundColor: "#f9fbfd",
     paddingBottom: "7px",
   };
-  const quillRef = useRef<ReactQuill | null>(null);
 
   function decodeAndManipulate(encodedString: string): string {
     const decodedString = atob(encodedString);
@@ -58,12 +55,6 @@ function Home({
   }
 
   useEffect(() => {
-    if (quillRef && quillRef.current) {
-      quillRef.current.getEditor().focus();
-    }
-  }, [currentId]);
-
-  useEffect(() => {
     function handleResize() {
       const isMobile = window.innerWidth <= 450;
       setModules((prevModules) => ({
@@ -74,49 +65,6 @@ function Home({
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (quillRef.current != null) {
-      const quill = quillRef.current.getEditor();
-      quillRef.current.getEditor().focus();
-
-      quill.getModule("toolbar").addHandler("image", () => {
-        const fileInput = document.createElement("input");
-        fileInput.setAttribute("type", "file");
-        fileInput.click();
-
-        fileInput.onchange = async () => {
-          if (fileInput.files === null) {
-            console.warn("No files selected");
-            return;
-          }
-          const file = fileInput.files[0];
-
-          try {
-            const compressedFile = await readAndCompressImage(
-              file,
-              imageConfig
-            );
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              const range = quill.getSelection();
-              const position = range ? range.index : 0;
-
-              if (e.target === null) {
-                console.warn("No target");
-                return;
-              }
-              quill.insertEmbed(position, "image", e.target.result, "user");
-            };
-            reader.readAsDataURL(compressedFile);
-          } catch (error) {
-            console.error("Failed to compress and resize image", error);
-          }
-        };
-      });
-    }
   }, []);
 
   return (
@@ -212,12 +160,11 @@ function Home({
               </div>
             </div>
             <div className="d-flex">
-              <ReactQuill
+              <QuillEditor
                 key={modules.toolbar.length}
-                ref={quillRef}
-                value={currNote?.body}
-                onChange={(value, _delta, _source, editor) =>
-                  handleChange(currNote?.id || 0, value, editor.getContents())
+                value={currNote?.body || ""}
+                onChange={(value, delta) =>
+                  handleChange(currNote?.id || 0, value, delta)
                 }
                 modules={modules}
                 formats={formats}
