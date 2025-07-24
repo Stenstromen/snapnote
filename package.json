@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@types/quill": "^2.0.14",
-    "axios": "^1.4.0",
+    "axios": "^1.10.0",
     "bootstrap": "^5.3.7",
     "browser-image-resizer": "^2.4.1",
     "crypto": "^1.0.1",
