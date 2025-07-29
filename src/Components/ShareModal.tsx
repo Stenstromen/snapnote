@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+ 
 import { Modal, Button, Form, Stack, Nav } from "react-bootstrap";
 import { IShareModalProps } from "../Types";
 import { postNote } from "../Api";
